@@ -216,6 +216,7 @@ export class CartProduct {
 
     let amountQuantity: HTMLTableCellElement = document.createElement("th");
     productQuantity.appendChild(amountQuantity);
+    
     let amountPlusButton: HTMLButtonElement = document.createElement("button");
     amountQuantity.appendChild(amountPlusButton);
     amountQuantity.className = "hej";
