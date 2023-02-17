@@ -1,6 +1,6 @@
 /*
-1. Se om du kan hitta problem med koden nedan och se om du kan göra den bättre.
-*/
+1. Se om du kan hitta problem med koden nedan och se om du kan göra den bättre.*/
+
 export enum Sort {
   PRICE_ASCENDING = "Stigande pris",
   PRICE_DECENDING = "Sjunkande pris",
@@ -15,53 +15,39 @@ export class Product {
     public imageUrl: string[],
     public price: number,
     public description: string
-  ) {
-    this.id = id;
-    this.name = name;
-    this.imageUrl = imageUrl;
-    this.price = price;
-    this.description = description;
-  }
+  ) {}
 }
 
-export function sortProductsBy(sort: Sort, products: Product[]): Product[] {
-  let copiedList: Product[] = [];
-  products.forEach((product) => copiedList.push(product));
-
+export function sortProductsBy(sort: Sort, products: Product[]) {
+  let productList: Product[] = products.slice();
   let sortedList: Product[] = [];
-  if (sort === Sort.PRICE_ASCENDING) {
-    sortedList = sortList("Price", copiedList);
-    sortedList.reverse();
-  } else if (sort === Sort.PRICE_DECENDING) {
-    sortedList = sortList("Price", copiedList);
-  } else if (sort === Sort.NAME_ALPHABETIC) {
-    sortedList = sortList("Name", copiedList);
-  } else if (sort === Sort.NAME_ALPHABETIC_REVERSE) {
-    sortedList = sortList("Name", copiedList);
-    sortedList.reverse();
+  let reverseList = false;
+
+  if (sort === Sort.PRICE_ASCENDING || sort === Sort.NAME_ALPHABETIC_REVERSE) {
+    reverseList = true;
   }
 
-  return sortedList;
-}
-
-function sortList(whichAttribute: string, products: Product[]): Product[] {
-  return products.sort((p1, p2) => {
-    if (whichAttribute === "Price") {
+  sortedList = productList.sort((p1, p2) => {
+    if (sort === Sort.PRICE_ASCENDING || sort === Sort.PRICE_DECENDING) {
       if (p1.price < p2.price) {
         return 1;
       } else if (p1.price > p2.price) {
         return -1;
       }
-      return 0;
     } else {
       if (p1.name < p2.name) {
         return 1;
       } else if (p1.name > p2.name) {
         return -1;
       }
-      return 0;
     }
+    return 0;
   });
+
+  if (reverseList) {
+    sortedList.reverse();
+  }
+  return sortedList;
 }
 
 /*
@@ -74,14 +60,14 @@ export let cartList = JSON.parse(localStorage.getItem("savedCartList") || "[]");
 export let productList = JSON.parse(localStorage.getItem("savedList") || "[]");
 
 export function createProductHtml() {
-  let quantity = 0;
-  for (let i = 0; i < cartList.length; i++) {
-    quantity += cartList[i].quantity;
-  }
-  let floatingCart = document.getElementById(
-    "floatingcartnumber"
-  ) as HTMLElement;
-  floatingCart.innerHTML = "" + quantity;
+
+  const quantity = cartList.reduce((total: number, item: { quantity: number; }) => {
+    return total + item.quantity;
+  }, 0);
+  
+  const floatingCart = document.getElementById("floatingcartnumber") as HTMLElement;
+  floatingCart.innerHTML = `${quantity}`;
+}
 
   for (let i = 0; i < productList.length; i++) {
     let dogproduct: HTMLDivElement = document.createElement("div");
@@ -129,8 +115,8 @@ export function createProductHtml() {
     dogImg.addEventListener("click", () => {
       productList[i].productSpec = !productList[i].productSpec;
       window.location.href = "product-spec.html#backArrow";
-      let listastext = JSON.stringify(productList);
-      localStorage.setItem("savedList", listastext);
+      let listAsText = JSON.stringify(productList);
+      localStorage.setItem("savedList", listAsText);
     });
 
     cartSymbol.addEventListener("click", () => {
@@ -138,36 +124,37 @@ export function createProductHtml() {
       cart.addToCart(i);
     });
 
-    if (productList[i].category === "sassy") {
-      let cat1: HTMLElement = document.getElementById("sassy") as HTMLElement;
-      dogproduct.className = "dogproduct";
-      cat1.appendChild(dogproduct);
-    }
-    if (productList[i].category === "kriminella") {
-      let cat2: HTMLElement = document.getElementById(
-        "kriminella"
-      ) as HTMLElement;
-      dogproduct.className = "dogproduct";
-      cat2.appendChild(dogproduct);
-    }
-    if (productList[i].category == "singlar") {
-      let cat3: HTMLElement = document.getElementById("singlar") as HTMLElement;
-      dogproduct.className = "dogproduct";
-      cat3.appendChild(dogproduct);
-    }
-    if (productList[i].category === "puppy") {
-      let cat4: HTMLElement = document.getElementById("puppy") as HTMLElement;
-      dogproduct.className = "dogproduct";
-      cat4.appendChild(dogproduct);
-    }
-    if (productList[i].category === "oldies") {
-      let cat5: HTMLElement = document.getElementById("oldies") as HTMLElement;
-      dogproduct.className = "dogproduct";
-      cat5.appendChild(dogproduct);
-    }
+    switch (productList[i].category) {
+      case "sassy":
+        let category1: HTMLElement = document.getElementById("sassy") as HTMLElement;
+        dogproduct.className = "dogproduct";
+        category1.appendChild(dogproduct);
+        break;
+      case "kriminella":
+        let category2: HTMLElement = document.getElementById("kriminella") as HTMLElement;
+        dogproduct.className = "dogproduct";  //här finns konstiga svenska klassnamn, men om jag ändrar dem här och inte i "DOM" pajjar jag koden, så jag lät dessa vara därför.
+        category2.appendChild(dogproduct);
+        break;
+      case "singlar":
+        let category3: HTMLElement = document.getElementById("singlar") as HTMLElement;
+        dogproduct.className = "dogproduct";
+        category3.appendChild(dogproduct);
+        break;
+      case "puppy":
+        let category4: HTMLElement = document.getElementById("puppy") as HTMLElement;
+        dogproduct.className = "dogproduct";
+        category4.appendChild(dogproduct);
+        break;
+      case "oldies":
+        let category5: HTMLElement = document.getElementById("oldies") as HTMLElement;
+        dogproduct.className = "dogproduct";
+        category5.appendChild(dogproduct);
+        break;
+      default:
   }
-  let listastext = JSON.stringify(productList);
-  localStorage.setItem("savedList", listastext);
+
+  let listAsText = JSON.stringify(productList);
+  localStorage.setItem("savedList", listAsText);
   sessionStorage.clear();
 }
 
@@ -183,82 +170,83 @@ export class CartProduct {
   ) {}
 }
 
-function getfromstorage() {
-  let container = document.getElementById("checkout-table");
+  function getFromStorage(): CartProduct[] {
+    const fromStorage = localStorage.getItem("cartArray");
+    
+    if (fromStorage === null) {
+      return [];
+    }
+    
+    const productList: CartProduct[] = JSON.parse(fromStorage);
+    return productList;
+  }
 
-  let fromstorage: string = localStorage.getItem("cartArray") || "";
-  let astext: CartProduct[] = JSON.parse(fromstorage);
+  function createHTML(productList: CartProduct[]) {
 
-  let productcontainer = document.getElementById(
-    "product-ckeckout-container"
-  ) as HTMLDivElement;
+  const container = document.getElementById("checkout-table");
+  let amountContainer = document.getElementById("amount-checkout-container2") as HTMLDivElement;
+  let amountText: HTMLTableCellElement = document.createElement("th");
+  container?.appendChild(amountContainer)
+  amountContainer.appendChild(amountText);
+  amountText.innerHTML = "amount:";
 
-  let amountcontainer = document.getElementById(
-    "amount-checkout-container2"
-  ) as HTMLDivElement;
-  let amounttext: HTMLTableCellElement = document.createElement("th");
-  amountcontainer.appendChild(amounttext);
-  amounttext.innerHTML = "amount:";
+  let titleContainer = document.getElementById("title-container") as HTMLTableRowElement;
+  titleContainer.innerHTML = "<strong>products:</strong>";
 
-  let titlecontainer = document.getElementById(
-    "title-container"
-  ) as HTMLTableRowElement;
-  titlecontainer.innerHTML = "<strong>products:</strong>";
+  let productQuantity = document.getElementById("product-quantity") as HTMLTableRowElement;
+  let quantityText: HTMLTableCellElement = document.createElement("th");
+  productQuantity.appendChild(quantityText);
+  quantityText.innerHTML = "change quantity:";
 
-  let productquantity = document.getElementById(
-    "product-quantity"
-  ) as HTMLTableRowElement;
-  let qttext: HTMLTableCellElement = document.createElement("th");
-  productquantity.appendChild(qttext);
-  qttext.innerHTML = "change quantity:";
+  let checkkoutTotal2 = document.getElementById("title-total") as HTMLTableCellElement;
+  let totalText: HTMLTableCellElement = document.createElement("th");
+  checkkoutTotal2.appendChild(totalText);
+  totalText.innerHTML = "total:";
 
-  let checkkouttotal2 = document.getElementById(
-    "title-total"
-  ) as HTMLTableCellElement;
-  let totaltext: HTMLTableCellElement = document.createElement("th");
-  checkkouttotal2.appendChild(totaltext);
-  totaltext.innerHTML = "total:";
+  for (let i: number = 0; i < productList.length; i++) {
+    let productName: HTMLTableCellElement = document.createElement("th");
+    titleContainer.appendChild(productName);
+    productName.innerHTML = productList[i].name;
+    productName.className = "hej"; //tycker denna klass har konstigt namn, men vet inte vad det är tänkt att vara riktigt
 
-  for (let i: number = 0; i < astext.length; i++) {
-    let productt: HTMLTableCellElement = document.createElement("th");
-    titlecontainer.appendChild(productt);
-    productt.innerHTML = astext[i].name;
-    productt.className = "hej";
+    let productAmount: HTMLTableCellElement = document.createElement("th");
+    amountContainer.appendChild(productAmount);
+    productAmount.innerHTML = `x ${productList[i].amount}`;
+    productAmount.className = "hej";
 
-    let amountt: HTMLTableCellElement = document.createElement("th");
-    amountcontainer.appendChild(amountt);
-    amountt.innerHTML = "x" + astext[i].amount;
-    amountt.className = "hej";
-
-    let amountqt: HTMLTableCellElement = document.createElement("th");
-    productquantity.appendChild(amountqt);
-    let amountplusbtn: HTMLButtonElement = document.createElement("button");
-    amountqt.appendChild(amountplusbtn);
-    amountqt.className = "hej";
+    let amountQuantity: HTMLTableCellElement = document.createElement("th");
+    productQuantity.appendChild(amountQuantity);
+    let amountPlusButton: HTMLButtonElement = document.createElement("button");
+    amountQuantity.appendChild(amountPlusButton);
+    amountQuantity.className = "hej";
 
     let icon: HTMLSpanElement = document.createElement("i");
-    amountplusbtn.appendChild(icon);
+    amountPlusButton.appendChild(icon);
 
     icon.className = "fas fa-minus";
-    amountplusbtn.className = "plusbtn";
+    amountPlusButton.className = "plus-button";
 
     let icon2: HTMLSpanElement = document.createElement("i");
     icon2.className = "fas fa-plus";
 
-    let amountminusbtn: HTMLButtonElement = document.createElement("button");
-    amountqt.appendChild(amountminusbtn);
-    amountminusbtn.appendChild(icon2);
-    amountminusbtn.className = "minusbtn";
+    let amountMinusButton: HTMLButtonElement = document.createElement("button");
+    amountQuantity.appendChild(amountMinusButton);
+    amountMinusButton.appendChild(icon2);
+    amountMinusButton.className = "minus-button";
   }
 
-  let addition: number = 0;
+  function calculateTotalPrice(productList: CartProduct[]) {
 
-  for (let i = 0; i < astext.length; i++) {
-    addition += astext[i].price *= astext[i].amount;
+  const total = productList.reduce((accumulator, current) => {
+    return accumulator + current.price * current.amount;
+  }, 0);
+  
+  let totalPrice2: HTMLTableCellElement = document.createElement("th");
+  checkkoutTotal2.appendChild(totalPrice2);
+  totalPrice2.innerHTML = total + "$";
+  totalPrice2.id = "total-in-center";
   }
-
-  let totalprice2: HTMLTableCellElement = document.createElement("th");
-  checkkouttotal2.appendChild(totalprice2);
-  totalprice2.innerHTML = addition + "$";
-  totalprice2.id = "totalincenter";
 }
+  
+//Har fortfarande otroligt svårt för att bena ut exakt hur jag ska refaktorera långa kodblock, och hur jag ska använda generics då det är så nytt att det inte har satt sig.
+//Räknar inte med VG men försökte mig på den delen också bara för att göra mitt bästa och lära mig.

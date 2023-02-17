@@ -4,14 +4,11 @@
   dessa hopplängder.
   */
 
-function getLength(jumpings: number[]): number {
-  let totalNumber = 0;
+function sumJumpLengths(jumpings: number[]): number {
 
-  totalNumber = jumpings.reduce(
-    (jumpDistanceSoFar, currentJump) => jumpDistanceSoFar + currentJump
+ return jumpings.reduce(
+    (jumpDistanceSoFar: number, currentJump: number) => jumpDistanceSoFar + currentJump
   );
-
-  return totalNumber;
 }
 
 /*
@@ -27,14 +24,8 @@ class Student {
 }
 
 function getStudentStatus(student: Student): string {
-  student.passed =
-    student.name == "Sebastian"
-      ? student.handedInOnTime
-        ? true
-        : false
-      : false;
-
-  if (student.passed) {
+  if (student.name == "Sebastian" && student.handedInOnTime) { 
+    student.passed = true;
     return "VG";
   } else {
     return "IG";
@@ -46,77 +37,64 @@ function getStudentStatus(student: Student): string {
   Det finns flera code smells att identifiera här. Vissa är lurigare än andra.
   */
 
-class Temp {
-  constructor(public q: string, public where: Date, public v: number) {}
+class Temperature {
+  constructor(public location: string, public date: Date, public temperature: number) {}
 }
 
-function averageWeeklyTemperature(heights: Temp[]) {
-  let r = 0;
+function averageWeeklyTemperatureInStockholm(temperatures: Temperature[]) {
+  let sumOfDailyTemperatures = 0;
+  const weekInMilliseconds = 604800000;
 
-  for (let who = 0; who < heights.length; who++) {
-    if (heights[who].q === "Stockholm") {
-      if (heights[who].where.getTime() > Date.now() - 604800000) {
-        r += heights[who].v;
+  for (let index = 0; index < temperatures.length; index++) {
+    if (temperatures[index].location === "Stockholm" && temperatures[index].date.getTime() > Date.now() - weekInMilliseconds) {
+        sumOfDailyTemperatures += temperatures[index].temperature;
       }
     }
-  }
 
-  return r / 7;
+  return sumOfDailyTemperatures / 7;
 }
 
 /*
   4. Följande funktion kommer att presentera ett objekt i dom:en. 
   Se om du kan göra det bättre. Inte bara presentationen räknas, även strukturer.
   */
+  class Product {
+    constructor (
+    public name: string,
+    public price: number,
+    public image: string) {}
+  }
 
-function showProduct(
-  name: string,
-  price: number,
-  amount: number,
-  description: string,
-  image: string,
-  parent: HTMLElement
-) {
-  let container = document.createElement("div");
-  let title = document.createElement("h4");
-  let pris = document.createElement("strong");
-  let imageTag = document.createElement("img");
-
-  title.innerHTML = name;
-  pris.innerHTML = price.toString();
-  imageTag.src = image;
-
-  container.appendChild(title);
-  container.appendChild(imageTag);
-  container.appendChild(pris);
-  parent.appendChild(container);
+function showProduct(product:Product, parent: HTMLElement) {
+  let productContainer = document.createElement(`
+  <div>
+  <h4>${product.name}</h4>
+  <strong>${product.price.toString}</strong>
+  <img src=${product.image}>`)
+  parent.appendChild(productContainer) as HTMLElement;
 }
 
 /*
   5. Följande funktion kommer presentera studenter. Men det finns ett antal saker som 
   går att göra betydligt bättre. Gör om så många som du kan hitta!
   */
-function presentStudents(students: Student[]) {
-  for (const student of students) {
-    if (student.handedInOnTime) {
-      let container = document.createElement("div");
-      let checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = true;
+function presentStudents(students: Student[]) { 
+  let listOfStudents;
 
-      container.appendChild(checkbox);
-      let listOfStudents = document.querySelector("ul#passedstudents");
-      listOfStudents?.appendChild(container);
+  for (const student of students) { 
+    let container = document.createElement("div") as HTMLDivElement; 
+    let checkbox = document.createElement("input") as HTMLInputElement; 
+    checkbox.type = "checkbox";
+    container.appendChild(checkbox) as HTMLInputElement; 
+
+    if (student.handedInOnTime) { 
+        checkbox.checked = true;
+        listOfStudents = document.querySelector("ul#passedstudents");
     } else {
-      let container = document.createElement("div");
-      let checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
       checkbox.checked = false;
-
-      container.appendChild(checkbox);
-      let listOfStudents = document.querySelector("ul#failedstudents");
-      listOfStudents?.appendChild(container);
+      listOfStudents = document.querySelector("ul#failedstudents");
     }
+    listOfStudents?.appendChild(container);
   }
 }
 
@@ -126,14 +104,8 @@ function presentStudents(students: Student[]) {
   Exemplet under löser problemet, men inte speciellt bra. Hur kan man göra istället?
   */
 function concatenateStrings() {
-  let result = "";
-  result += "Lorem";
-  result += "ipsum";
-  result += "dolor";
-  result += "sit";
-  result += "amet";
-
-  return result;
+  let listOfWords = ["Lorem", "ipsum", "dolor", "sit", "amet"];
+  return listOfWords.join(" ");
 }
 
 /* 
@@ -142,21 +114,23 @@ function concatenateStrings() {
     fler och fler parametrar behöver läggas till? T.ex. avatar eller adress. Hitta en bättre
     lösning som är hållbar och skalar bättre. 
 */
-function createUser(
-  name: string,
-  birthday: Date,
-  email: string,
-  password: string
-) {
-  // Validation
 
-  let ageDiff = Date.now() - birthday.getTime();
-  let ageDate = new Date(ageDiff);
-  let userAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+class User {
+  constructor(
+    public name: string,
+    public birthday: Date,
+    public email: string,
+    public password: string
+  ) {}
+}
 
-  console.log(userAge);
+function checkUserAge(user: User) {
 
-  if (!(userAge < 20)) {
+  let ageDiff = Date.now() - user.birthday.getTime(); //skillnaden mellan birthday och nu i millisekunder
+  let ageDate = new Date(ageDiff); //personens födelsedatum
+  let userAge = Math.abs(ageDate.getUTCFullYear() - 1970);//förkortar födelsedatum till enbart år
+
+  if (userAge >= 20) {
     // Logik för att skapa en användare
   } else {
     return "Du är under 20 år";
